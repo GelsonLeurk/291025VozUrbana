@@ -1,7 +1,15 @@
-body {
-    font-family: "Georgia", serif;
-    background-color: #f9f7f4;
-    color: #333;
+/* cores padrão alteradas para tons de cinza */
+:root {
+    --bg-color: #f0f0f0;    /* fundo geral (cinza claro) */
+    --text-color: #333333;  /* texto principal (cinza escuro) */
+    --muted-color: #7a7a7a; /* texto secundário */
+    --accent-color: #6b6b6b; /* acentos/links em tom de cinza */
+}
+
+html, body {
+    background-color: var(--bg-color);
+    color: var(--text-color);
+    font-family: Arial, Helvetica, sans-serif;
     margin: 0;
     padding: 0;
 }
