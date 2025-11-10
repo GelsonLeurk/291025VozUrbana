@@ -18,7 +18,7 @@
         <?php if ($ponto->foto): ?>
             <p><img src="<?= $ponto->foto ?>" alt="Foto do ponto" style="max-width:100%;border-radius:8px;"></p>
         <?php endif; ?>
-        <div id="map" style="height: 400px; margin-top: 20px;"></div>
+        <div id="map" style="height:500px;"></div>
 
         <div class="menu">
             <a href="index.php?action=listar" class="btn">Voltar à Lista</a>
@@ -30,13 +30,19 @@
     </footer>
 
     <script>
-        var map = L.map('map').setView([<?= $ponto->latitude ?>, <?= $ponto->longitude ?>], 15);
+        const lat = <?= isset($ponto) ? floatval($ponto->latitude) : '0' ?>;
+        const lng = <?= isset($ponto) ? floatval($ponto->longitude) : '0' ?>;
+        const tipoTexto = <?= isset($ponto) ? json_encode($ponto->tipo) : '""' ?>;
+        const descricaoTexto = <?= isset($ponto) ? json_encode($ponto->descricao) : '""' ?>;
+
+        var map = L.map('map').setView([lat, lng], 15);
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
             attribution: '© OpenStreetMap'
         }).addTo(map);
-        L.marker([<?= $ponto->latitude ?>, <?= $ponto->longitude ?>])
+
+        L.marker([lat, lng])
             .addTo(map)
-            .bindPopup("<?= addslashes($ponto->tipo) ?>")
+            .bindPopup(`<strong>${tipoTexto}</strong><br>${descricaoTexto}`)
             .openPopup();
     </script>
 </body>

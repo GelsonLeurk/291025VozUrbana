@@ -1,9 +1,8 @@
-<?php 
-require_once "model/Ponto.php";
-require_once "model/PontoDAO.php";
+<?php
+require_once __DIR__ . '/../model/PontoDAO.php';
+require_once __DIR__ . '/../model/Ponto.php';
 
 class PontoController {
-
     private $dao;
 
     public function __construct() {
@@ -30,22 +29,33 @@ class PontoController {
         ) {
             $foto = null;
 
+            // caminho físico do diretório de uploads
+            $uploadDir = __DIR__ . '/../public/img/uploads/';
+            if (!is_dir($uploadDir)) {
+                mkdir($uploadDir, 0755, true);
+            }
+
             if (isset($_FILES['foto']) && $_FILES['foto']['error'] == UPLOAD_ERR_OK) {
                 $extensao = pathinfo($_FILES['foto']['name'], PATHINFO_EXTENSION);
-                $nomeArquivo = uniqid() . "." . $extensao;
-                $caminho = "public/img/uploads/" . $nomeArquivo;
+                $nomeArquivo = uniqid('img_', true) . '.' . $extensao;
+                $caminhoFisico = $uploadDir . $nomeArquivo;
+                $caminhoRelativo = 'public/img/uploads/' . $nomeArquivo;
 
-                if (move_uploaded_file($_FILES['foto']['tmp_name'], $caminho)) {
-                    $foto = $caminho;
+                if (move_uploaded_file($_FILES['foto']['tmp_name'], $caminhoFisico)) {
+                    $foto = $caminhoRelativo;
                 }
             }
 
+            // validações básicas de lat/lng
+            $lat = filter_var($_POST['latitude'], FILTER_VALIDATE_FLOAT);
+            $lng = filter_var($_POST['longitude'], FILTER_VALIDATE_FLOAT);
+
             $ponto = new Ponto(
                 null,
-                $_POST['tipo'],
-                $_POST['descricao'],
-                $_POST['latitude'],
-                $_POST['longitude'],
+                trim($_POST['tipo']),
+                trim($_POST['descricao']),
+                $lat !== false ? $lat : $_POST['latitude'],
+                $lng !== false ? $lng : $_POST['longitude'],
                 $foto,
                 date("Y-m-d H:i:s")
             );
@@ -54,6 +64,7 @@ class PontoController {
         }
 
         header("Location: index.php?action=listar");
+        exit;
     }
 
     // Lista todos os pontos cadastrados
@@ -65,7 +76,11 @@ class PontoController {
     // Exibe um ponto específico no mapa (opcional)
     public function mapa($id) {
         $ponto = $this->dao->buscarPorId($id);
-        include "view/mapa.php";
+        if (!$ponto) {
+            header("Location: index.php?action=listar");
+            exit;
+        }
+        include __DIR__ . '/../view/mapa.php';
     }
 }
 ?>

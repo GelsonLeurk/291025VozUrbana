@@ -1,4 +1,9 @@
 <?php
+/**
+ * Model: Ponto
+ *
+ * Representa um ponto reportado no sistema.
+ */
 class Ponto {
     public $id;
     public $tipo;
